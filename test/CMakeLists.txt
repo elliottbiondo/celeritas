@@ -174,6 +174,7 @@ celeritas_setup_tests(SERIAL PREFIX orange LINK_LIBRARIES CeleritasOrangeTest)
 
 # Base-level
 celeritas_add_test(orange/BoundingBox.test.cc)
+celeritas_add_test(orange/Translator.test.cc)
 
 # Surfaces
 celeritas_add_test(orange/surf/detail/QuadraticSolver.test.cc)
