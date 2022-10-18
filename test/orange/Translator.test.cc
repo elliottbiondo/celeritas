@@ -14,16 +14,24 @@ namespace celeritas
 namespace test
 {
 //---------------------------------------------------------------------------//
-using TranslatorTest = Test;
-
-TEST_F(TranslatorTest, basic)
+class TranslatorTest : public Test
 {
-    Translator trans;
-    Real3      point{0.1, 0.2, 0.3};
+  protected:
+    Real3 translation_{1, 2, 3};
+};
 
-    trans(point, {1, 2, 3});
+TEST_F(TranslatorTest, down)
+{
+    TranslatorDown translate(translation_);
 
-    EXPECT_VEC_SOFT_EQ((Real3{1.1, 2.2, 3.3}), point);
+    EXPECT_VEC_SOFT_EQ((Real3{.1, .2, .3}), translate(Real3{1.1, 2.2, 3.3}));
+}
+
+TEST_F(TranslatorTest, up)
+{
+    TranslatorUp translate(translation_);
+
+    EXPECT_VEC_SOFT_EQ((Real3{1.1, 2.2, 3.3}), translate(Real3{.1, .2, .3}));
 }
 
 //---------------------------------------------------------------------------//

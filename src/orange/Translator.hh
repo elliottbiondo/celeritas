@@ -14,32 +14,101 @@ namespace celeritas
 {
 //---------------------------------------------------------------------------//
 /*!
- * Class for performing spatial translations of 3D points
+ * Translate points from a parent's reference frame into the daughter.
+ *
+ * The input "translation" is the transformation applied to a daughter universe
+ * to place it in the parent. The daughter is a "lower" level compared to the
+ * parent.
  */
-class Translator
+class TranslatorDown
 {
   public:
-    // Constructor
-    CELER_FUNCTION inline Translator(){};
+    // Construct with the parent-to-daughter translation
+    CELER_FUNCTION TranslatorDown(const Real3& translation);
 
     // Translate a single point
-    CELER_FORCEINLINE_FUNCTION void
-    operator()(Real3& point, const Real3& trans_vec) const;
+    CELER_FORCEINLINE_FUNCTION Real3 operator()(const Real3& parent) const;
+
+  private:
+    const Real3& translation_;
+};
+
+//---------------------------------------------------------------------------//
+/*!
+ * Translate points from a daughter's reference frame "up" into the parent.
+ *
+ * The input "translation" is the transformation applied to a daughter universe
+ * to place it in the parent. The daughter is a "lower" level compared to the
+ * parent.
+ */
+class TranslatorUp
+{
+    // using Values
+    //    = Collection<Real3, Ownership::const_reference, MemSpace::native>;
+
+  public:
+    // Construct with the parent-to-daughter translation
+    CELER_FUNCTION
+    TranslatorUp(const Real3& translation);
+
+    // CELER_FUNCTION TranslatorUp(const Values& translation, TranslationId id)
+    //    : translation_{translation[id]}
+    //{
+    //}
+
+    // Translate a single point
+    CELER_FORCEINLINE_FUNCTION Real3 operator()(const Real3& parent) const;
+
+  private:
+    const Real3& translation_;
 };
 
 //---------------------------------------------------------------------------//
 // INLINE DEFINITIONS
 //---------------------------------------------------------------------------//
 /*!
- * Translate a single point
+ * Construct with translation.
  */
-CELER_FORCEINLINE_FUNCTION void
-Translator::operator()(Real3& point, const Real3& trans_vec) const
+CELER_FUNCTION TranslatorDown::TranslatorDown(const Real3& translation)
+    : translation_(translation)
 {
-    for (const auto& i : range(point.size()))
+}
+
+//---------------------------------------------------------------------------//
+/*!
+ * Translate a single point.
+ */
+CELER_FUNCTION Real3 TranslatorDown::operator()(const Real3& parent) const
+{
+    Real3 daughter;
+    for (int i : range(3))
     {
-        point[i] += trans_vec[i];
+        daughter[i] = parent[i] - translation_[i];
     }
+    return daughter;
+}
+
+//---------------------------------------------------------------------------//
+/*!
+ * Construct with translation.
+ */
+CELER_FUNCTION TranslatorUp::TranslatorUp(const Real3& translation)
+    : translation_(translation)
+{
+}
+
+//---------------------------------------------------------------------------//
+/*!
+ * Translate a single point.
+ */
+CELER_FUNCTION Real3 TranslatorUp::operator()(const Real3& parent) const
+{
+    Real3 daughter;
+    for (int i : range(3))
+    {
+        daughter[i] = parent[i] + translation_[i];
+    }
+    return daughter;
 }
 
 //---------------------------------------------------------------------------//
