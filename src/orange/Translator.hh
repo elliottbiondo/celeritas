@@ -24,7 +24,7 @@ class TranslatorDown
 {
   public:
     // Construct with the parent-to-daughter translation
-    CELER_FUNCTION TranslatorDown(const Real3& translation);
+    CELER_FUNCTION inline TranslatorDown(const Real3& translation);
 
     // Translate a single point
     CELER_FORCEINLINE_FUNCTION Real3 operator()(const Real3& parent) const;
@@ -48,8 +48,7 @@ class TranslatorUp
 
   public:
     // Construct with the parent-to-daughter translation
-    CELER_FUNCTION
-    TranslatorUp(const Real3& translation);
+    CELER_FUNCTION inline TranslatorUp(const Real3& translation);
 
     // CELER_FUNCTION TranslatorUp(const Values& translation, TranslationId id)
     //    : translation_{translation[id]}
