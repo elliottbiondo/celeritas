@@ -7,11 +7,13 @@
 //---------------------------------------------------------------------------//
 #pragma once
 
+#include <unordered_map>
 #include <vector>
 
 #include "corecel/cont/Label.hh"
 #include "orange/BoundingBox.hh"
 #include "orange/Data.hh"
+#include "orange/Translator.hh"
 #include "orange/Types.hh"
 
 namespace celeritas
@@ -76,6 +78,8 @@ struct UnitInput
     SurfaceInput             surfaces;
     std::vector<VolumeInput> volumes;
     BoundingBox              bbox; //!< Outer bounding box
+
+    std::unordered_map<VolumeId, Real3> translations;
 
     // Unit metadata
     Label label;
