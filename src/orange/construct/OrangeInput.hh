@@ -75,11 +75,12 @@ struct VolumeInput
  */
 struct UnitInput
 {
+    using Translation_Map = std::unordered_map<VolumeId, Real3>;
+
     SurfaceInput             surfaces;
     std::vector<VolumeInput> volumes;
     BoundingBox              bbox; //!< Outer bounding box
-
-    std::unordered_map<VolumeId, Real3> translations;
+    Translation_Map          translation_map;
 
     // Unit metadata
     Label label;
