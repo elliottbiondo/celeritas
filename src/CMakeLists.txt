@@ -142,6 +142,7 @@ list(APPEND SOURCES
   orange/Types.cc
   orange/construct/SurfaceInputBuilder.cc
   orange/detail/UnitInserter.cc
+  orange/detail/UnitIndexer.cc
   orange/surf/SurfaceIO.cc
 
   celeritas/Types.cc
