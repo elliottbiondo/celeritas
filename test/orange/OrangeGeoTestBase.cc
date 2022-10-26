@@ -106,7 +106,7 @@ void OrangeGeoTestBase::build_geometry(OneVolInput inp)
     UnitInput input;
     {
         // Insert volumes
-        VolumeInput    vi;
+        VolumeInput vi;
         vi.logic = {logic::ltrue};
         vi.flags = (inp.complex_tracking ? VolumeInput::Flags::internal_surfaces
                                          : 0);
@@ -117,7 +117,7 @@ void OrangeGeoTestBase::build_geometry(OneVolInput inp)
     // Save fake bbox for sampling
     input.bbox = {{-0.5, -0.5, -0.5}, {0.5, 0.5, 0.5}};
 
-    input.label = "one volume";
+    input.label = "one_volume";
 
     return this->build_geometry(std::move(input));
 }
@@ -157,7 +157,7 @@ void OrangeGeoTestBase::build_geometry(TwoVolInput inp)
     input.bbox = {{-inp.radius, -inp.radius, -inp.radius},
                   {inp.radius, inp.radius, inp.radius}};
 
-    input.label = "two volumes";
+    input.label = "two_volumes";
 
     return this->build_geometry(std::move(input));
 }
