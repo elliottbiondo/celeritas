@@ -36,12 +36,12 @@ class UnitIndexer
     UnitIndexer(Vec_Size num_surfaces, Vec_Size num_volumes);
 
     // Local-to-global
-    inline SurfaceId global_surface(UniverseId uni, SurfaceId surface) const;
-    inline VolumeId  global_volume(UniverseId uni, VolumeId volume) const;
+    SurfaceId global_surface(UniverseId uni, SurfaceId surface) const;
+    VolumeId  global_volume(UniverseId uni, VolumeId volume) const;
 
     // Global-to-local
-    inline Local_Surface local_surface(SurfaceId id) const;
-    inline Local_Volume  local_volume(VolumeId id) const;
+    Local_Surface local_surface(SurfaceId id) const;
+    Local_Volume  local_volume(VolumeId id) const;
 
     //! Total number of universes
     size_type num_universes() const { return d_surfaces.size() - 1; }

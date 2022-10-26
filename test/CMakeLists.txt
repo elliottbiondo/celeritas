@@ -190,6 +190,9 @@ celeritas_add_test(orange/univ/detail/LogicEvaluator.test.cc)
 celeritas_add_test(orange/univ/detail/LogicStack.test.cc)
 celeritas_add_test(orange/univ/detail/SurfaceFunctors.test.cc)
 
+# Top-level detail
+celeritas_add_test(orange/detail/UnitIndexer.test.cc)
+
 ### Tests that require a geometry input ###
 
 celeritas_add_test(orange/univ/detail/SenseCalculator.test.cc)
