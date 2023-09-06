@@ -290,6 +290,7 @@ OrangeTrackView::operator=(Initializer_t const& init)
         lsa.universe() = uid;
 
         // daughter_id = tracker.daughter(tinit.volume);
+        CELER_ASSERT(tinit.volume);
         visit_universe(
             [&tinit, &daughter_id](auto&& t) {
                 daughter_id = t.daughter(tinit.volume);
@@ -596,7 +597,6 @@ CELER_FUNCTION void OrangeTrackView::move_internal(Real3 const& pos)
         auto lsa = this->make_lsa(lev);
         lsa.pos() = local_pos;
 
-        // Apply "transform down" based on stored transform
         apply_transform(translate_down,
                         this->get_transform(this->get_daughter(lsa)));
     }
@@ -687,6 +687,7 @@ CELER_FUNCTION void OrangeTrackView::cross_boundary()
 
     // auto daughter_id = tracker.daughter(volume_id);
     DaughterId daughter_id;
+    CELER_ASSERT(volume_id);
     visit_universe([&volume_id, &daughter_id](
                        auto&& t) { daughter_id = t.daughter(volume_id); },
                    lsa.universe());
@@ -715,6 +716,8 @@ CELER_FUNCTION void OrangeTrackView::cross_boundary()
                 volume_id = t.initialize(local).volume;
             },
             universe_id);
+
+        CELER_ASSERT(volume_id);
         visit_universe([&volume_id, &daughter_id](
                            auto&& t) { daughter_id = t.daughter(volume_id); },
                        universe_id);
