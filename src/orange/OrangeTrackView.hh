@@ -1149,7 +1149,9 @@ OrangeTrackView::make_lsa(LevelId level) const
 CELER_FORCEINLINE_FUNCTION DaughterId
 OrangeTrackView::get_daughter(LevelStateAccessor const& lsa)
 {
-    return this->make_tracker(lsa.universe()).daughter(lsa.vol());
+    UniverseVisitor visit_universe{params_};
+    return visit_universe(
+        [&lsa](auto&& t) { return t.daughter(lsa.vol()); }, lsa.universe());
 }
 
 //---------------------------------------------------------------------------//
