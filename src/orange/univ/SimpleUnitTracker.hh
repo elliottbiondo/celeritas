@@ -46,26 +46,26 @@ class SimpleUnitTracker
   public:
     // Construct with parameters (unit definitions and this one's ID)
     inline CELER_FUNCTION
-    SimpleUnitTracker(ParamsRef const& params, SimpleUnitId id);
+    SimpleUnitTracker(ParamsRef const* params, SimpleUnitId id);
 
     //// ACCESSORS ////
 
     //! Number of local volumes
     CELER_FUNCTION LocalVolumeId::size_type num_volumes() const
     {
-        return unit_record_.volumes.size();
+        return unit_record_->volumes.size();
     }
 
     //! Number of local surfaces
     CELER_FUNCTION LocalSurfaceId::size_type num_surfaces() const
     {
-        return unit_record_.surfaces.size();
+        return unit_record_->surfaces.size();
     }
 
     //! SimpleUnitRecord for this tracker
     CELER_FUNCTION SimpleUnitRecord const& unit_record() const
     {
-        return unit_record_;
+        return *unit_record_;
     }
 
     // DaughterId of universe embedded in a given volume
@@ -99,8 +99,8 @@ class SimpleUnitTracker
   private:
     //// DATA ////
 
-    ParamsRef const& params_;
-    SimpleUnitRecord const& unit_record_;
+    ParamsRef const* params_;
+    SimpleUnitRecord const* unit_record_;
 
     //// METHODS ////
 
@@ -143,8 +143,8 @@ class SimpleUnitTracker
  * surfaces belong to us.
  */
 CELER_FUNCTION
-SimpleUnitTracker::SimpleUnitTracker(ParamsRef const& params, SimpleUnitId suid)
-    : params_(params), unit_record_(params.simple_units[suid])
+SimpleUnitTracker::SimpleUnitTracker(ParamsRef const* params, SimpleUnitId suid)
+    : params_(params), unit_record_(&(params_->simple_units[suid]))
 {
     CELER_EXPECT(params_);
 }
@@ -185,7 +185,7 @@ SimpleUnitTracker::initialize(LocalState const& state) const -> Initialization
     else if (!id)
     {
         // Not found: replace with background volume (if any)
-        id = unit_record_.background;
+        id = unit_record_->background;
     }
 
     return Initialization{id, {}};
@@ -247,7 +247,7 @@ SimpleUnitTracker::cross_boundary(LocalState const& state) const
         }
     }
 
-    return {unit_record_.background, state.surface};
+    return {unit_record_->background, state.surface};
 }
 
 //---------------------------------------------------------------------------//
@@ -305,7 +305,7 @@ CELER_FUNCTION real_type SimpleUnitTracker::safety(Real3 const& pos,
 
     // Calculate minimim distance to all local faces
     real_type result = numeric_limits<real_type>::infinity();
-    LocalSurfaceVisitor visit_surface(params_, unit_record_.surfaces);
+    LocalSurfaceVisitor visit_surface(*params_, unit_record_->surfaces);
     detail::CalcSafetyDistance calc_safety{pos};
     for (LocalSurfaceId surface : vol.faces())
     {
@@ -325,7 +325,7 @@ SimpleUnitTracker::normal(Real3 const& pos, LocalSurfaceId surf) const -> Real3
 {
     CELER_EXPECT(surf);
 
-    LocalSurfaceVisitor visit_surface(params_, unit_record_.surfaces);
+    LocalSurfaceVisitor visit_surface(*params_, unit_record_->surfaces);
     return visit_surface(detail::CalcNormal{pos}, surf);
 }
 
@@ -342,10 +342,10 @@ CELER_FUNCTION auto SimpleUnitTracker::get_neighbors(LocalSurfaceId surf) const
 
     OpaqueId<ConnectivityRecord> conn_id
         = unit_record_.connectivity[surf.unchecked_get()];
-    ConnectivityRecord const& conn = params_.connectivity_records[conn_id];
+    ConnectivityRecord const& conn = params_->connectivity_records[conn_id];
 
     CELER_ENSURE(!conn.neighbors.empty());
-    return params_.local_volume_ids[conn.neighbors];
+    return params_->local_volume_ids[conn.neighbors];
 }
 
 //---------------------------------------------------------------------------//
@@ -358,8 +358,8 @@ template<class F>
 CELER_FUNCTION LocalVolumeId
 SimpleUnitTracker::find_volume_where(Real3 const& pos, F&& predicate) const
 {
-    detail::BIHTraverser find_impl{unit_record_.bih_tree,
-                                   params_.bih_tree_data};
+    detail::BIHTraverser find_impl{unit_record_->bih_tree,
+                                   params_->bih_tree_data};
     return find_impl(pos, predicate);
 }
 
@@ -406,7 +406,7 @@ SimpleUnitTracker::intersect_impl(LocalState const& state, F&& is_valid) const
         state.surface ? vol.find_face(state.surface.id()) : FaceId{},
         vol.simple_intersection(),
         state.temp_next};
-    LocalSurfaceVisitor visit_surface(params_, unit_record_.surfaces);
+    LocalSurfaceVisitor visit_surface(*params_, unit_record_->surfaces);
     for (LocalSurfaceId surface : vol.faces())
     {
         visit_surface(calc_intersections, surface);
@@ -491,7 +491,7 @@ SimpleUnitTracker::simple_intersect(LocalState const& state,
     }
     else
     {
-        LocalSurfaceVisitor visit_surface(params_, unit_record_.surfaces);
+        LocalSurfaceVisitor visit_surface(*params_, unit_record_->surfaces);
         SignedSense ss = visit_surface(detail::CalcSense{state.pos}, surface);
         CELER_ASSERT(ss != SignedSense::on);
         cur_sense = to_sense(ss);
@@ -595,7 +595,7 @@ SimpleUnitTracker::background_intersect(LocalState const& state,
 {
     // Calculate bump distance
     const real_type bump_dist
-        = detail::BumpCalculator{params_.scalars.tol}(state.pos);
+        = detail::BumpCalculator{params_->scalars.tol}(state.pos);
 
     // Loop over distances and surface indices to cross by iterating over
     // temp_next.isect[:num_isect].
@@ -651,7 +651,7 @@ SimpleUnitTracker::background_intersect(LocalState const& state,
 CELER_FORCEINLINE_FUNCTION LocalSurfaceVisitor
 SimpleUnitTracker::make_surface_visitor() const
 {
-    return LocalSurfaceVisitor{params_, unit_record_.surfaces};
+    return LocalSurfaceVisitor{*params_, unit_record_->surfaces};
 }
 
 //---------------------------------------------------------------------------//
@@ -661,7 +661,7 @@ SimpleUnitTracker::make_surface_visitor() const
 CELER_FORCEINLINE_FUNCTION VolumeView
 SimpleUnitTracker::make_local_volume(LocalVolumeId vid) const
 {
-    return VolumeView{params_, unit_record_, vid};
+    return VolumeView{*params_, *unit_record_, vid};
 }
 
 //---------------------------------------------------------------------------//
@@ -671,7 +671,7 @@ SimpleUnitTracker::make_local_volume(LocalVolumeId vid) const
 CELER_FORCEINLINE_FUNCTION DaughterId
 SimpleUnitTracker::daughter(LocalVolumeId vol) const
 {
-    return params_.volume_records[unit_record_.volumes[vol]].daughter_id;
+    return params_->volume_records[unit_record_->volumes[vol]].daughter_id;
 }
 
 //---------------------------------------------------------------------------//

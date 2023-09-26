@@ -76,7 +76,7 @@ struct InitializingExecutor
     CELER_FUNCTION void operator()(TrackSlotId tid) const
     {
         // Instantiate tracker and initialize
-        SimpleUnitTracker tracker(this->params, SimpleUnitId{0});
+        SimpleUnitTracker tracker(&(this->params), SimpleUnitId{0});
         auto lstate = build_local_state(params, states, tid);
         auto init = tracker.initialize(lstate);
 

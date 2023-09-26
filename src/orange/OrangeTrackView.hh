@@ -950,7 +950,7 @@ CELER_FUNCTION SimpleUnitTracker OrangeTrackView::make_tracker(UniverseId id) co
     using IdT = OpaqueId<typename TraitsT::record_type>;
     using TrackerT = typename TraitsT::tracker_type;
 
-    return TrackerT{params_, IdT{id.unchecked_get()}};
+    return TrackerT{&params_, IdT{id.unchecked_get()}};
 }
 
 //---------------------------------------------------------------------------//
