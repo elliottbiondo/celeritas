@@ -45,6 +45,9 @@ class RectArrayTracker
     inline CELER_FUNCTION
     RectArrayTracker(ParamsRef const* params, RectArrayId rid);
 
+    // Default constructor
+    CELER_FUNCTION RectArrayTracker() {}
+
     //// ACCESSORS ////
 
     //! Number of local volumes

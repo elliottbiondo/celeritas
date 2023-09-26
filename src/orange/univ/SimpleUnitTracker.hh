@@ -48,6 +48,9 @@ class SimpleUnitTracker
     inline CELER_FUNCTION
     SimpleUnitTracker(ParamsRef const* params, SimpleUnitId id);
 
+    // Default constructor
+    CELER_FUNCTION SimpleUnitTracker() {}
+
     //// ACCESSORS ////
 
     //! Number of local volumes

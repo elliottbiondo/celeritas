@@ -17,6 +17,7 @@
 #include "detail/LevelStateAccessor.hh"
 #include "detail/UniverseIndexer.hh"
 #include "transform/TransformVisitor.hh"
+#include "univ/RectArrayTracker.hh"
 #include "univ/SimpleUnitTracker.hh"
 #include "univ/UniverseTypeTraits.hh"
 #include "univ/detail/Types.hh"
@@ -127,6 +128,8 @@ class OrangeTrackView
     ParamsRef const& params_;
     StateRef const& states_;
     TrackSlotId track_slot_;
+    SimpleUnitTracker simple_unit_tracker_;
+    RectArrayTracker rect_array_tracker_;
 
     // Temporary next-step data
     real_type next_step_{0};
@@ -229,7 +232,11 @@ CELER_FUNCTION
 OrangeTrackView::OrangeTrackView(ParamsRef const& params,
                                  StateRef const& states,
                                  TrackSlotId tid)
-    : params_(params), states_(states), track_slot_(tid)
+    : params_(params)
+    , states_(states)
+    , track_slot_(tid)
+    , simple_unit_tracker_()
+    , rect_array_tracker_()
 {
     CELER_EXPECT(params_);
     CELER_EXPECT(states_);
