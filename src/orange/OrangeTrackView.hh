@@ -186,7 +186,7 @@ class OrangeTrackView
     inline CELER_FUNCTION void find_next_step_impl(detail::Intersection isect);
 
     // Create a local tracker
-    inline CELER_FUNCTION SimpleUnitTracker* make_tracker(UniverseId);
+    inline CELER_FUNCTION Tracker* make_tracker(UniverseId);
 
     // Create local sense reference
     inline CELER_FUNCTION Span<Sense> make_temp_sense() const;
@@ -949,17 +949,23 @@ CELER_FUNCTION real_type OrangeTrackView::find_safety(real_type)
  * \todo Template on tracker type, allow multiple universe types (see
  * UniverseTypeTraits.hh)
  */
-CELER_FUNCTION SimpleUnitTracker* OrangeTrackView::make_tracker(UniverseId id)
+CELER_FUNCTION Tracker* OrangeTrackView::make_tracker(UniverseId id)
 {
     CELER_EXPECT(id < params_.universe_types.size());
     CELER_EXPECT(id.unchecked_get() == params_.universe_indices[id]);
 
-    using TraitsT = UniverseTypeTraits<UniverseType::simple>;
-    using IdT = OpaqueId<typename TraitsT::record_type>;
-    using TrackerT = typename TraitsT::tracker_type;
-
-    simple_unit_tracker_ = TrackerT{&params_, IdT{id.unchecked_get()}};
-    return &simple_unit_tracker_;
+    if (params_.universe_types[id] == UniverseType::simple)
+    {
+        simple_unit_tracker_
+            = SimpleUnitTracker{&params_, SimpleUnitId{id.unchecked_get()}};
+        return &simple_unit_tracker_;
+    }
+    else
+    {
+        rect_array_tracker_
+            = RectArrayTracker{&params_, RectArrayId{id.unchecked_get()}};
+        return &rect_array_tracker_;
+    }
 }
 
 //---------------------------------------------------------------------------//
