@@ -14,6 +14,7 @@
 #include "orange/OrangeData.hh"
 #include "orange/univ/detail/RaggedRightIndexer.hh"
 
+#include "Tracker.hh"
 #include "detail/Types.hh"
 #include "detail/Utils.hh"
 
@@ -23,7 +24,7 @@ namespace celeritas
 /*!
  * Track a particle within an axes-aligned rectilinear grid.
  */
-class RectArrayTracker
+class RectArrayTracker : public Tracker
 {
   public:
     //!@{

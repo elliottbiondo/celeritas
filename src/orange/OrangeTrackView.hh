@@ -19,6 +19,7 @@
 #include "transform/TransformVisitor.hh"
 #include "univ/RectArrayTracker.hh"
 #include "univ/SimpleUnitTracker.hh"
+#include "univ/Tracker.hh"
 #include "univ/UniverseTypeTraits.hh"
 #include "univ/detail/Types.hh"
 

@@ -15,6 +15,7 @@
 #include "orange/detail/BIHTraverser.hh"
 #include "orange/surf/LocalSurfaceVisitor.hh"
 
+#include "Tracker.hh"
 #include "detail/LogicEvaluator.hh"
 #include "detail/SenseCalculator.hh"
 #include "detail/SurfaceFunctors.hh"
@@ -32,7 +33,7 @@ namespace celeritas
  * the masked unit tracker because it requires all volumes to be exactly
  * defined by their connected surfaces. It does *not* check for overlaps.
  */
-class SimpleUnitTracker
+class SimpleUnitTracker : public Tracker
 {
   public:
     //!@{
