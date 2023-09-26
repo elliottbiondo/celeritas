@@ -952,18 +952,17 @@ CELER_FUNCTION real_type OrangeTrackView::find_safety(real_type)
 CELER_FUNCTION Tracker* OrangeTrackView::make_tracker(UniverseId id)
 {
     CELER_EXPECT(id < params_.universe_types.size());
-    CELER_EXPECT(id.unchecked_get() == params_.universe_indices[id]);
 
     if (params_.universe_types[id] == UniverseType::simple)
     {
-        simple_unit_tracker_
-            = SimpleUnitTracker{&params_, SimpleUnitId{id.unchecked_get()}};
+        simple_unit_tracker_ = SimpleUnitTracker{
+            &params_, SimpleUnitId{params_.universe_indices[id]}};
         return &simple_unit_tracker_;
     }
     else
     {
-        rect_array_tracker_
-            = RectArrayTracker{&params_, RectArrayId{id.unchecked_get()}};
+        rect_array_tracker_ = RectArrayTracker{
+            &params_, RectArrayId{params_.universe_indices[id]}};
         return &rect_array_tracker_;
     }
 }
