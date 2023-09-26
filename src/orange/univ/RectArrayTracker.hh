@@ -14,6 +14,7 @@
 #include "orange/OrangeData.hh"
 #include "orange/univ/detail/RaggedRightIndexer.hh"
 
+#include "Tracker.hh"
 #include "detail/Types.hh"
 #include "detail/Utils.hh"
 
@@ -23,7 +24,7 @@ namespace celeritas
 /*!
  * Track a particle within an axes-aligned rectilinear grid.
  */
-class RectArrayTracker
+class RectArrayTracker : public Tracker
 {
   public:
     //!@{
@@ -43,14 +44,17 @@ class RectArrayTracker
   public:
     // Construct with parameters (unit definitions and this one's ID)
     inline CELER_FUNCTION
-    RectArrayTracker(ParamsRef const& params, RectArrayId rid);
+    RectArrayTracker(ParamsRef const* params, RectArrayId rid);
+
+    // Default constructor
+    CELER_FUNCTION RectArrayTracker() {}
 
     //// ACCESSORS ////
 
     //! Number of local volumes
     CELER_FUNCTION LocalVolumeId::size_type num_volumes() const
     {
-        return record_.daughters.size();
+        return record_->daughters.size();
     }
 
     //! Number of local surfaces
@@ -59,7 +63,7 @@ class RectArrayTracker
         size_type num_surfs = 0;
         for (auto ax : range(Axis::size_))
         {
-            num_surfs += record_.dims[to_int(ax)] + 1;
+            num_surfs += record_->dims[to_int(ax)] + 1;
         }
         return num_surfs;
     }
@@ -94,8 +98,8 @@ class RectArrayTracker
 
   private:
     //// DATA ////
-    ParamsRef const& params_;
-    RectArrayRecord const& record_;
+    ParamsRef const* params_;
+    RectArrayRecord const* record_;
 
     //// METHODS ////
 
@@ -118,8 +122,8 @@ class RectArrayTracker
  * Construct with reference to persistent parameter data.
  */
 CELER_FUNCTION
-RectArrayTracker::RectArrayTracker(ParamsRef const& params, RectArrayId rid)
-    : params_(params), record_(params.rect_arrays[rid])
+RectArrayTracker::RectArrayTracker(ParamsRef const* params, RectArrayId rid)
+    : params_(params), record_(&(params->rect_arrays[rid]))
 {
     CELER_EXPECT(params_);
 }
@@ -161,7 +165,7 @@ CELER_FUNCTION auto RectArrayTracker::initialize(LocalState const& state) const
         }
     }
 
-    VolumeIndexer to_index(record_.dims);
+    VolumeIndexer to_index(record_->dims);
     return {LocalVolumeId{to_index(coords)}, {}};
 }
 
@@ -176,8 +180,8 @@ RectArrayTracker::cross_boundary(LocalState const& state) const
     CELER_EXPECT(state.surface && state.volume);
 
     // Find the coords of the current volume
-    VolumeIndexer to_index(record_.dims);
-    VolumeInverseIndexer to_coords(record_.dims);
+    VolumeIndexer to_index(record_->dims);
+    VolumeInverseIndexer to_coords(record_->dims);
     auto coords = to_coords(state.volume.unchecked_get());
     auto ax_idx = this->find_surface_axis_idx(state.surface.id());
 
@@ -185,7 +189,7 @@ RectArrayTracker::cross_boundary(LocalState const& state) const
     // possible
     CELER_ASSERT(
         !(coords[ax_idx] == 0 && state.surface.sense() == Sense::inside)
-        && !(coords[ax_idx] == record_.dims[ax_idx] - 1
+        && !(coords[ax_idx] == record_->dims[ax_idx] - 1
              && state.surface.sense() == Sense::outside));
 
     // Value for incrementing the axial coordinate upon crossing
@@ -237,7 +241,7 @@ CELER_FUNCTION real_type RectArrayTracker::safety(Real3 const& pos,
 {
     CELER_EXPECT(volid && volid.get() < this->num_volumes());
 
-    VolumeInverseIndexer to_coords(record_.dims);
+    VolumeInverseIndexer to_coords(record_->dims);
     auto coords = to_coords(volid.unchecked_get());
 
     real_type min_dist = numeric_limits<real_type>::infinity();
@@ -282,7 +286,7 @@ CELER_FORCEINLINE_FUNCTION DaughterId
 RectArrayTracker::daughter(LocalVolumeId vol) const
 {
     CELER_EXPECT(vol && vol.get() < this->num_volumes());
-    return record_.daughters[vol];
+    return record_->daughters[vol];
 }
 
 //---------------------------------------------------------------------------//
@@ -299,11 +303,11 @@ RectArrayTracker::intersect_impl(LocalState const& state, F is_valid) const
     CELER_EXPECT(state.volume && !state.temp_sense.empty());
 
     auto coords
-        = VolumeInverseIndexer{record_.dims}(state.volume.unchecked_get());
+        = VolumeInverseIndexer{record_->dims}(state.volume.unchecked_get());
 
     Intersection result;
     Sense sense;
-    SurfaceIndexer to_index(record_.surface_indexer_data);
+    SurfaceIndexer to_index(record_->surface_indexer_data);
 
     for (auto ax : range(Axis::size_))
     {
@@ -344,7 +348,7 @@ RectArrayTracker::intersect_impl(LocalState const& state, F is_valid) const
 CELER_FUNCTION size_type
 RectArrayTracker::find_surface_axis_idx(LocalSurfaceId s) const
 {
-    SurfaceInverseIndexer to_axis(record_.surface_indexer_data);
+    SurfaceInverseIndexer to_axis(record_->surface_indexer_data);
     return to_axis(s.unchecked_get())[0];
 }
 
@@ -354,7 +358,7 @@ RectArrayTracker::find_surface_axis_idx(LocalSurfaceId s) const
  */
 CELER_FUNCTION RectArrayTracker::Grid RectArrayTracker::make_grid(Axis ax) const
 {
-    return Grid(record_.grid[to_int(ax)], params_.reals);
+    return Grid(record_->grid[to_int(ax)], params_->reals);
 }
 
 //---------------------------------------------------------------------------//

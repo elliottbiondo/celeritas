@@ -123,7 +123,8 @@ LocalState RectArrayTrackerTest::make_state_crossing(Real3 pos,
 
 TEST_F(RectArrayTrackerTest, initialize)
 {
-    RectArrayTracker tracker(this->host_params(), RectArrayId{0});
+    RectArrayTracker tracker(&(this->host_params()), RectArrayId{0});
+
     SCOPED_TRACE("vol {0,0,0}");
     {
         auto init
@@ -153,7 +154,7 @@ TEST_F(RectArrayTrackerTest, intersect)
 {
     auto inf = std::numeric_limits<real_type>::infinity();
 
-    RectArrayTracker tracker(this->host_params(), RectArrayId{0});
+    RectArrayTracker tracker(&(this->host_params()), RectArrayId{0});
 
     SCOPED_TRACE(
         "RectArrayTracker, head-on intersections from volume (0, 0, 0)");
@@ -260,7 +261,7 @@ TEST_F(RectArrayTrackerTest, intersect)
 
 TEST_F(RectArrayTrackerTest, intersect_max_step)
 {
-    RectArrayTracker tracker(this->host_params(), RectArrayId{0});
+    RectArrayTracker tracker(&(this->host_params()), RectArrayId{0});
 
     SCOPED_TRACE("Intersecting with max_step parameter specified");
     {
@@ -283,7 +284,7 @@ TEST_F(RectArrayTrackerTest, intersect_max_step)
 
 TEST_F(RectArrayTrackerTest, cross_boundary)
 {
-    RectArrayTracker tracker(this->host_params(), RectArrayId{0});
+    RectArrayTracker tracker(&(this->host_params()), RectArrayId{0});
 
     SCOPED_TRACE("Crossing between internal cells through x=6 surface");
     {
@@ -330,7 +331,7 @@ TEST_F(RectArrayTrackerTest, cross_boundary)
 
 TEST_F(RectArrayTrackerTest, safety)
 {
-    RectArrayTracker tracker(this->host_params(), RectArrayId{0});
+    RectArrayTracker tracker(&(this->host_params()), RectArrayId{0});
 
     SCOPED_TRACE("In volume {0, 0, 0}");
     {
@@ -359,7 +360,7 @@ TEST_F(RectArrayTrackerTest, safety)
 
 TEST_F(RectArrayTrackerTest, normal)
 {
-    RectArrayTracker tracker(this->host_params(), RectArrayId{0});
+    RectArrayTracker tracker(&(this->host_params()), RectArrayId{0});
 
     SCOPED_TRACE("X normals");
     {
@@ -430,7 +431,7 @@ TEST_F(RectArrayTrackerTest, normal)
 
 TEST_F(RectArrayTrackerTest, daughter)
 {
-    RectArrayTracker tracker(this->host_params(), RectArrayId{0});
+    RectArrayTracker tracker(&(this->host_params()), RectArrayId{0});
 
     EXPECT_EQ(2, tracker.daughter(LocalVolumeId{0}).get());
     EXPECT_EQ(3, tracker.daughter(LocalVolumeId{1}).get());
