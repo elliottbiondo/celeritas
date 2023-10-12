@@ -345,7 +345,7 @@ CELER_FUNCTION auto SimpleUnitTracker::get_neighbors(LocalSurfaceId surf) const
     CELER_EXPECT(surf < this->num_surfaces());
 
     OpaqueId<ConnectivityRecord> conn_id
-        = unit_record_.connectivity[surf.unchecked_get()];
+        = unit_record_->connectivity[surf.unchecked_get()];
     ConnectivityRecord const& conn = params_->connectivity_records[conn_id];
 
     CELER_ENSURE(!conn.neighbors.empty());

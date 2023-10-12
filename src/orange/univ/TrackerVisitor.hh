@@ -78,7 +78,7 @@ TrackerVisitor::operator()(F&& func, UniverseId id)
             using UTraits = decltype(u_traits);
             using UId = OpaqueId<typename UTraits::record_type>;
             using Tracker = typename UTraits::tracker_type;
-            return func(Tracker{params_, UId{universe_idx}});
+            return func(Tracker{&params_, UId{universe_idx}});
         },
         params_.universe_types[id]);
 }
