@@ -467,7 +467,7 @@ CELER_FUNCTION Propagation OrangeTrackView::find_next_step()
 
     // Find intersection at the top level: always the first simple unit
     auto global_isect = [this] {
-        SimpleUnitTracker t{params_, SimpleUnitId{0}};
+        SimpleUnitTracker t{&params_, SimpleUnitId{0}};
         return t.intersect(this->make_local_state(LevelId{0}));
     }();
     // Find intersection for all lower levels
@@ -493,7 +493,7 @@ CELER_FUNCTION Propagation OrangeTrackView::find_next_step(real_type max_step)
 
     // Find intersection at the top level: always the first simple unit
     auto global_isect = [this, &max_step] {
-        SimpleUnitTracker t{params_, SimpleUnitId{0}};
+        SimpleUnitTracker t{&params_, SimpleUnitId{0}};
         return t.intersect(this->make_local_state(LevelId{0}), max_step);
     }();
     // Find intersection for all lower levels
@@ -647,10 +647,10 @@ CELER_FUNCTION void OrangeTrackView::cross_boundary()
     // Starting with the current level (i.e., next_surface_level), iterate
     // down into the deepest level
     size_type level = sl.get();
-    LocalVolumeId volume = tinit.volume;
+    LocalVolumeId volume_id = tinit.volume;
     auto universe_id = lsa.universe();
 
-    CELER_ASSERT(volume);
+    CELER_ASSERT(volume_id);
     auto daughter_id = tracker->daughter(volume_id);
 
     while (daughter_id)
@@ -669,11 +669,11 @@ CELER_FUNCTION void OrangeTrackView::cross_boundary()
         // Initialize in daughter and get IDs of volume and potential daughter
         auto* daughter_tracker = this->make_tracker(universe_id);
         volume_id = daughter_tracker->initialize(local).volume;
-        CELER_ASSERT(volume);
+        CELER_ASSERT(volume_id);
         daughter_id = daughter_tracker->daughter(volume_id);
 
         auto lsa = make_lsa(LevelId{level});
-        lsa.vol() = volume;
+        lsa.vol() = volume_id;
         lsa.pos() = local.pos;
         lsa.dir() = local.dir;
         lsa.universe() = universe_id;
