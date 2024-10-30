@@ -78,12 +78,18 @@ TEST_F(BIHTraverserTest, basic)
     ref_storage_ = storage_;
     BIHTraverser t(bih_tree, ref_storage_);
 
-    EXPECT_EQ(LocalVolumeId{0}, t.find_volume({0.8, 0.5, 110}, valid_volid_));
-    EXPECT_EQ(LocalVolumeId{1}, t.find_volume({0.8, 0.5, 30}, valid_volid_));
-    EXPECT_EQ(LocalVolumeId{2}, t.find_volume({2.0, 0.6, 40}, valid_volid_));
-    EXPECT_EQ(LocalVolumeId{3}, t.find_volume({2.9, 0.7, 50}, valid_volid_));
-    EXPECT_EQ(LocalVolumeId{4}, t.find_volume({2.9, -0.7, 50}, valid_volid_));
-    EXPECT_EQ(LocalVolumeId{5}, t.find_volume({2.9, -0.7, 50}, odd_volid_));
+    EXPECT_EQ(LocalVolumeId{0},
+              t.find_enclosing_volume({0.8, 0.5, 110}, valid_volid_));
+    EXPECT_EQ(LocalVolumeId{1},
+              t.find_enclosing_volume({0.8, 0.5, 30}, valid_volid_));
+    EXPECT_EQ(LocalVolumeId{2},
+              t.find_enclosing_volume({2.0, 0.6, 40}, valid_volid_));
+    EXPECT_EQ(LocalVolumeId{3},
+              t.find_enclosing_volume({2.9, 0.7, 50}, valid_volid_));
+    EXPECT_EQ(LocalVolumeId{4},
+              t.find_enclosing_volume({2.9, -0.7, 50}, valid_volid_));
+    EXPECT_EQ(LocalVolumeId{5},
+              t.find_enclosing_volume({2.9, -0.7, 50}, odd_volid_));
 }
 
 //---------------------------------------------------------------------------//
@@ -120,7 +126,8 @@ TEST_F(BIHTraverserTest, grid)
     ref_storage_ = storage_;
     BIHTraverser t(bih_tree, ref_storage_);
 
-    EXPECT_EQ(LocalVolumeId{0}, t.find_volume({0.8, 0.5, 110}, valid_volid_));
+    EXPECT_EQ(LocalVolumeId{0},
+              t.find_enclosing_volume({0.8, 0.5, 110}, valid_volid_));
 
     size_type index{1};
     for (auto i : range(3))
@@ -129,7 +136,8 @@ TEST_F(BIHTraverserTest, grid)
         {
             constexpr real_type half{0.5};
             EXPECT_EQ(LocalVolumeId{index++},
-                      t.find_volume({half + i, half + j, 30}, valid_volid_));
+                      t.find_enclosing_volume({half + i, half + j, 30},
+                                              valid_volid_));
         }
     }
 }
@@ -148,7 +156,8 @@ TEST_F(BIHTraverserTest, single_finite_volume)
     ref_storage_ = storage_;
     BIHTraverser t(bih_tree, ref_storage_);
 
-    EXPECT_EQ(LocalVolumeId{0}, t.find_volume({0.5, 0.5, 0.5}, valid_volid_));
+    EXPECT_EQ(LocalVolumeId{0},
+              t.find_enclosing_volume({0.5, 0.5, 0.5}, valid_volid_));
 }
 
 TEST_F(BIHTraverserTest, multiple_nonpartitionable_volumes)
@@ -162,8 +171,10 @@ TEST_F(BIHTraverserTest, multiple_nonpartitionable_volumes)
     ref_storage_ = storage_;
     BIHTraverser t(bih_tree, ref_storage_);
 
-    EXPECT_EQ(LocalVolumeId{0}, t.find_volume({0.5, 0.5, 0.5}, valid_volid_));
-    EXPECT_EQ(LocalVolumeId{1}, t.find_volume({0.5, 0.5, 0.5}, odd_volid_));
+    EXPECT_EQ(LocalVolumeId{0},
+              t.find_enclosing_volume({0.5, 0.5, 0.5}, valid_volid_));
+    EXPECT_EQ(LocalVolumeId{1},
+              t.find_enclosing_volume({0.5, 0.5, 0.5}, odd_volid_));
 }
 
 TEST_F(BIHTraverserTest, single_infinite_volume)
@@ -176,7 +187,8 @@ TEST_F(BIHTraverserTest, single_infinite_volume)
     ref_storage_ = storage_;
     BIHTraverser t(bih_tree, ref_storage_);
 
-    EXPECT_EQ(LocalVolumeId{0}, t.find_volume({0.5, 0.5, 0.5}, valid_volid_));
+    EXPECT_EQ(LocalVolumeId{0},
+              t.find_enclosing_volume({0.5, 0.5, 0.5}, valid_volid_));
 }
 
 TEST_F(BIHTraverserTest, multiple_infinite_volumes)
@@ -190,8 +202,10 @@ TEST_F(BIHTraverserTest, multiple_infinite_volumes)
     ref_storage_ = storage_;
     BIHTraverser t(bih_tree, ref_storage_);
 
-    EXPECT_EQ(LocalVolumeId{0}, t.find_volume({0.5, 0.5, 0.5}, valid_volid_));
-    EXPECT_EQ(LocalVolumeId{1}, t.find_volume({0.5, 0.5, 0.5}, odd_volid_));
+    EXPECT_EQ(LocalVolumeId{0},
+              t.find_enclosing_volume({0.5, 0.5, 0.5}, valid_volid_));
+    EXPECT_EQ(LocalVolumeId{1},
+              t.find_enclosing_volume({0.5, 0.5, 0.5}, odd_volid_));
 }
 
 //---------------------------------------------------------------------------//

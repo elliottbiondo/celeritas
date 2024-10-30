@@ -108,8 +108,8 @@ class SimpleUnitTracker
         get_neighbors(LocalSurfaceId) const;
 
     template<class F>
-    inline CELER_FUNCTION LocalVolumeId find_volume_where(Real3 const& pos,
-                                                          F&& predicate) const;
+    inline CELER_FUNCTION LocalVolumeId
+    find_enclosing_volume(Real3 const& pos, F&& predicate) const;
 
     template<class F>
     inline CELER_FUNCTION Intersection intersect_impl(LocalState const&,
@@ -178,7 +178,7 @@ SimpleUnitTracker::initialize(LocalState const& state) const -> Initialization
         on_surface = static_cast<bool>(logic_state.face);
         return detail::LogicEvaluator(vol.logic())(logic_state.senses);
     };
-    LocalVolumeId id = this->find_volume_where(state.pos, is_inside);
+    LocalVolumeId id = this->find_enclosing_volume(state.pos, is_inside);
 
     if (on_surface)
     {
@@ -243,7 +243,7 @@ SimpleUnitTracker::cross_boundary(LocalState const& state) const -> Initializati
     }
     else
     {
-        if (LocalVolumeId id = this->find_volume_where(state.pos, is_inside))
+        if (LocalVolumeId id = this->find_enclosing_volume(state.pos, is_inside))
         {
             return {id, on_surface};
         }
@@ -358,11 +358,11 @@ CELER_FUNCTION auto SimpleUnitTracker::get_neighbors(LocalSurfaceId surf) const
  */
 template<class F>
 CELER_FUNCTION LocalVolumeId
-SimpleUnitTracker::find_volume_where(Real3 const& pos, F&& predicate) const
+SimpleUnitTracker::find_enclosing_volume(Real3 const& pos, F&& predicate) const
 {
     detail::BIHTraverser traverser{unit_record_.bih_tree,
                                    params_.bih_tree_data};
-    return traverser.find_volume(pos, predicate);
+    return traverser.find_enclosing_volume(pos, predicate);
 }
 
 //---------------------------------------------------------------------------//
