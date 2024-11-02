@@ -56,8 +56,6 @@ class BIHIntersectingVolFinder
 
   private:
     //// DATA ////
-    BIHTree const& tree_;
-    Storage const& storage_;
     BIHTraversalHelper helper_;
 
     //// HELPER FUNCTIONS ////
@@ -94,7 +92,7 @@ class BIHIntersectingVolFinder
 CELER_FUNCTION
 BIHIntersectingVolFinder::BIHIntersectingVolFinder(
     BIHTree const& tree, BIHIntersectingVolFinder::Storage const& storage)
-    : tree_(tree), storage_(storage), helper_(tree, storage)
+    : helper_(tree, storage)
 {
     CELER_EXPECT(tree);
 }
@@ -217,9 +215,8 @@ CELER_FUNCTION auto BIHIntersectingVolFinder::visit_leaf(
 {
     for (auto i : range(leaf_node.vol_ids.size()))
     {
-        auto id = storage_.local_volume_ids[leaf_node.vol_ids[i]];
-
-        auto const& bbox = storage_.bboxes[tree_.bboxes[id]];
+        auto id = helper_.get_leaf_volid(leaf_node, i);
+        auto const& bbox = helper_.get_bbox(id);
 
         if (this->visit_bbox(bbox, ray, min_intersection.dist))
         {
@@ -242,11 +239,9 @@ CELER_FUNCTION auto BIHIntersectingVolFinder::visit_inf_vols(
     F&& visit_vol,
     BIHIntersectingVolFinder::Intersection min_intersection) const -> Intersection
 {
-    for (auto i : range(tree_.inf_volids.size()))
+    for (auto i : range(helper_.get_num_inf_volids()))
     {
-        auto id = storage_.local_volume_ids[tree_.inf_volids[i]];
-
-        auto intersection = visit_vol(id);
+        auto intersection = visit_vol(helper_.get_inf_volid(i));
         if (intersection.dist < min_intersection.dist)
         {
             min_intersection = intersection;
