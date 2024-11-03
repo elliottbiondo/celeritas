@@ -79,8 +79,8 @@ class BIHIntersectingVolFinder
 
     // Determine if any inf_vols contain the point
     template<class F>
-    inline CELER_FUNCTION Intersection
-    visit_inf_vols(F&& is_inside, Intersection intersection) const;
+    inline CELER_FUNCTION Intersection visit_inf_vols(Intersection intersection,
+                                                      F&& visit_vol) const;
 };
 
 //---------------------------------------------------------------------------//
@@ -129,9 +129,7 @@ BIHIntersectingVolFinder::operator()(BIHIntersectingVolFinder::Ray const& ray,
 
     } while (current_node);
 
-    // return this->visit_inf_vols(is_inside);
-
-    return intersection;
+    return this->visit_inf_vols(intersection, visit_vol);
 }
 
 //---------------------------------------------------------------------------//
@@ -236,8 +234,8 @@ CELER_FUNCTION auto BIHIntersectingVolFinder::visit_leaf(
  */
 template<class F>
 CELER_FUNCTION auto BIHIntersectingVolFinder::visit_inf_vols(
-    F&& visit_vol,
-    BIHIntersectingVolFinder::Intersection min_intersection) const -> Intersection
+    BIHIntersectingVolFinder::Intersection min_intersection,
+    F&& visit_vol) const -> Intersection
 {
     for (auto i : range(helper_.get_num_inf_volids()))
     {
