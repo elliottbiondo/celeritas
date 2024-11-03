@@ -12,7 +12,6 @@
 #include "BIHTraversalHelper.hh"
 #include "../BoundingBoxUtils.hh"
 #include "../OrangeData.hh"
-#include "../OrangeTypes.hh"
 
 namespace celeritas
 {
