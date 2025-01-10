@@ -13,6 +13,7 @@
 #include "orange/OrangeTypes.hh"
 #include "orange/SenseUtils.hh"
 #include "orange/detail/BIHEnclosingVolFinder.hh"
+#include "orange/detail/BIHIntersectingVolFinder.hh"
 #include "orange/surf/LocalSurfaceVisitor.hh"
 
 #include "detail/InfixEvaluator.hh"
@@ -630,14 +631,19 @@ SimpleUnitTracker::background_intersect(LocalState const& state,
         // senses, since we can't know the change in sense of the
         // target surface without marching through all interior surfaces.
         // Assume that bumping past the surface means not on any surface.
-        Real3 pos{state.pos};
-        axpy(state.temp_next.distance[isect] + bump_dist, state.dir, &pos);
+        Real3 bumped_pos{state.pos};
+        axpy(state.temp_next.distance[isect] + bump_dist,
+             state.dir,
+             &bumped_pos);
 
-        // Loop over volumes connected to this surface.
-        //! \todo Accelerate by intersecting neighbors with BVH grid
-        for (LocalVolumeId vol_id : this->get_neighbors(surface))
-        {
-            CELER_ASSERT(vol_id != state.volume);
+        detail::BIHIntersectingVolFinder find_intersection{
+            unit_record_.bih_tree, params_.bih_tree_data};
+
+        auto is_intersecting = [this, &state, &surface, &isect](
+                                   LocalVolumeId vol_id,
+                                   detail::BIHIntersectingVolFinder::Ray ray,
+                                   real_type max_search_dist
+                                   [[maybe_unused]]) -> Intersection {
             VolumeView vol = this->make_local_volume(vol_id);
             detail::OnFace face;
             auto calc_senses = detail::LazySenseCalculator{
@@ -645,17 +651,28 @@ SimpleUnitTracker::background_intersect(LocalState const& state,
 
             if (detail::LogicEvaluator{vol.logic()}(calc_senses))
             {
-                // We are in this new volume by crossing the tested surface.
-                // Get the sense corresponding to this "crossed" surface.
+                // We are in this new volume by crossing the tested
+                // surface. Get the sense corresponding to this "crossed"
+                // surface.
                 auto face = vol.find_face(surface);
                 CELER_ASSERT(face);
-
                 Intersection result;
                 result.distance = state.temp_next.distance[isect];
                 result.surface = detail::OnLocalSurface{
                     surface, flip_sense(calc_senses(face))};
                 return result;
             }
+            else
+            {
+                return Intersection{};
+            }
+        };
+
+        auto result
+            = find_intersection({bumped_pos, state.dir}, is_intersecting);
+        if (result)
+        {
+            return result;
         }
     }
 
