@@ -71,8 +71,9 @@ TEST_F(BIHEnclosingVolFinderTest, basic)
     bboxes_.push_back({{0, -1, 0}, {5, 0, 100}});
     bboxes_.push_back({{0, -1, 0}, {5, 0, 100}});
 
-    BIHBuilder bih(&storage_);
-    auto bih_tree = bih(std::move(bboxes_));
+    BIHBuilder build(&storage_);
+    BIHBuilder::SetLocalVolIds implicit_vol_ids;
+    auto bih_tree = build(std::move(bboxes_), std::move(implicit_vol_ids));
 
     ref_storage_ = storage_;
     BIHEnclosingVolFinder find_volume(bih_tree, ref_storage_);
@@ -113,8 +114,9 @@ TEST_F(BIHEnclosingVolFinderTest, grid)
         }
     }
 
-    BIHBuilder bih(&storage_);
-    auto bih_tree = bih(std::move(bboxes_));
+    BIHBuilder build(&storage_);
+    BIHBuilder::SetLocalVolIds implicit_vol_ids;
+    auto bih_tree = build(std::move(bboxes_), std::move(implicit_vol_ids));
 
     ref_storage_ = storage_;
     BIHEnclosingVolFinder find_volume(bih_tree, ref_storage_);
@@ -141,8 +143,9 @@ TEST_F(BIHEnclosingVolFinderTest, single_finite_volume)
 {
     bboxes_.push_back({{0, 0, 0}, {1, 1, 1}});
 
-    BIHBuilder bih(&storage_);
-    auto bih_tree = bih(std::move(bboxes_));
+    BIHBuilder build(&storage_);
+    BIHBuilder::SetLocalVolIds implicit_vol_ids;
+    auto bih_tree = build(std::move(bboxes_), std::move(implicit_vol_ids));
 
     ref_storage_ = storage_;
     BIHEnclosingVolFinder find_volume(bih_tree, ref_storage_);
@@ -155,8 +158,9 @@ TEST_F(BIHEnclosingVolFinderTest, multiple_nonpartitionable_volumes)
     bboxes_.push_back({{0, 0, 0}, {1, 1, 1}});
     bboxes_.push_back({{0, 0, 0}, {1, 1, 1}});
 
-    BIHBuilder bih(&storage_);
-    auto bih_tree = bih(std::move(bboxes_));
+    BIHBuilder build(&storage_);
+    BIHBuilder::SetLocalVolIds implicit_vol_ids;
+    auto bih_tree = build(std::move(bboxes_), std::move(implicit_vol_ids));
 
     ref_storage_ = storage_;
     BIHEnclosingVolFinder find_volume(bih_tree, ref_storage_);
@@ -169,8 +173,9 @@ TEST_F(BIHEnclosingVolFinderTest, single_infinite_volume)
 {
     bboxes_.push_back(FastBBox::from_infinite());
 
-    BIHBuilder bih(&storage_);
-    auto bih_tree = bih(std::move(bboxes_));
+    BIHBuilder build(&storage_);
+    BIHBuilder::SetLocalVolIds implicit_vol_ids;
+    auto bih_tree = build(std::move(bboxes_), std::move(implicit_vol_ids));
 
     ref_storage_ = storage_;
     BIHEnclosingVolFinder find_volume(bih_tree, ref_storage_);
@@ -183,8 +188,9 @@ TEST_F(BIHEnclosingVolFinderTest, multiple_infinite_volumes)
     bboxes_.push_back(FastBBox::from_infinite());
     bboxes_.push_back(FastBBox::from_infinite());
 
-    BIHBuilder bih(&storage_);
-    auto bih_tree = bih(std::move(bboxes_));
+    BIHBuilder build(&storage_);
+    BIHBuilder::SetLocalVolIds implicit_vol_ids;
+    auto bih_tree = build(std::move(bboxes_), std::move(implicit_vol_ids));
 
     ref_storage_ = storage_;
     BIHEnclosingVolFinder find_volume(bih_tree, ref_storage_);

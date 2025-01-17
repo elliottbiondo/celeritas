@@ -32,7 +32,8 @@ BIHBuilder::BIHBuilder(Storage* storage)
 /*!
  * Create BIH Nodes.
  */
-BIHTree BIHBuilder::operator()(VecBBox&& bboxes)
+BIHTree
+BIHBuilder::operator()(VecBBox&& bboxes, SetLocalVolIds&& implicit_vol_ids)
 {
     CELER_EXPECT(!bboxes.empty());
 
@@ -63,6 +64,10 @@ BIHTree BIHBuilder::operator()(VecBBox&& bboxes)
              * \todo make an exception for "EXTERIOR" volume and remove the
              * "infinite volume" exceptions?
              */
+            inf_vol_ids.push_back(id);
+        }
+        else if (implicit_vol_ids.find(id) != implicit_vol_ids.end())
+        {
             inf_vol_ids.push_back(id);
         }
         else
