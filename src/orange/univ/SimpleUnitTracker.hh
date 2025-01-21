@@ -447,7 +447,9 @@ SimpleUnitTracker::intersect_impl(LocalState const& state, F&& is_valid) const
         else if (vol.implicit_vol())
         {
             // Search all the volumes "externally"
-            return this->background_intersect(state, num_isect);
+            auto x = this->background_intersect(state, num_isect);
+            //fprintf(stderr, "Final answer = %f\n", static_cast<double>(x.distance));
+            return x;
         }
     }
 
@@ -619,8 +621,13 @@ SimpleUnitTracker::background_intersect(LocalState const& state,
 
     // Loop over distances and surface indices to cross by iterating over
     // temp_next.isect[:num_isect].
+
+    //fprintf(stderr, "Size of isect: %i \n", static_cast<int>(num_isect));
+
     for (size_type isect_idx = 0; isect_idx != num_isect; ++isect_idx)
     {
+        //fprintf(stderr, "\tchecking isect: %i \n", static_cast<int>(isect_idx));
+
         // Index into the distance/face arrays
         size_type const isect = state.temp_next.isect[isect_idx];
         // Inside the "background" volume, Face and Surface are the same
@@ -644,6 +651,10 @@ SimpleUnitTracker::background_intersect(LocalState const& state,
                                    detail::BIHIntersectingVolFinder::Ray ray,
                                    real_type max_search_dist
                                    [[maybe_unused]]) -> Intersection {
+
+            
+            //fprintf(stderr, "\t\t\t Call to is_intersection for vol_id: %i \n", static_cast<int>(vol_id.unchecked_get()));
+
             VolumeView vol = this->make_local_volume(vol_id);
             detail::OnFace face;
             auto calc_senses = detail::LazySenseCalculator{
@@ -660,6 +671,8 @@ SimpleUnitTracker::background_intersect(LocalState const& state,
                 result.distance = state.temp_next.distance[isect];
                 result.surface = detail::OnLocalSurface{
                     surface, flip_sense(calc_senses(face))};
+
+                //fprintf(stderr, "\t\t\tFound intersection at distance: %f \n", result.distance);
                 return result;
             }
             else
