@@ -278,6 +278,15 @@ BIHIntersectingVolFinder::visit_leaf(BIHLeafNode const& leaf_node,
 
         if (this->visit_bbox(bbox, ray, min_intersection.distance))
         {
+
+        //fprintf(stderr, "\t\tIn visit_bbox, found a a bbox with an intersection of : %f\n", static_cast<float>(x));
+        fprintf(stderr, "\t\t\t bbox (%f, %f, %f) (%f, %f, %f) \n", static_cast<float>(bbox.lower()[0]), static_cast<float>(bbox.lower()[1]), static_cast<float>(bbox.lower()[2])
+                                                                  , static_cast<float>(bbox.upper()[0]), static_cast<float>(bbox.upper()[1]), static_cast<float>(bbox.upper()[2]));
+
+        fprintf(stderr, "\t\t\t pos (%f, %f, %f) ray (%f, %f, %f) \n", static_cast<float>(ray.pos[0]), static_cast<float>(ray.pos[1]), static_cast<float>(ray.pos[2])
+                                                                     , static_cast<float>(ray.dir[0]), static_cast<float>(ray.dir[1]), static_cast<float>(ray.dir[2]));
+
+
             auto intersection = visit_vol(id, ray, min_intersection.distance);
             if (intersection)
             {
@@ -300,6 +309,7 @@ BIHIntersectingVolFinder::visit_inf_vols(Intersection min_intersection,
 {
     for (auto id : view_.inf_vol_ids())
     {
+        fprintf(stderr, "\t\t\tCall to intersection for non-partitionable vol %i\n", static_cast<int>(id.unchecked_get()));
         auto intersection = visit_vol(id, ray, min_intersection.distance);
         if (intersection)
         {
