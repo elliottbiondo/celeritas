@@ -394,11 +394,7 @@ IsRangeEqImpl(Iter1 e_iter,
     result << "Values in: " << actual_expr << "\n Expected: " << expected_expr
            << '\n'
            << failures.size() << " of " << expected_size << " elements differ";
-    if (failures.size() > 40)
-    {
-        result << " (truncating by removing all but the first and last 20)";
-        failures.erase(failures.begin() + 20, failures.end() - 20);
-    }
+
     result << '\n';
     return result;
 }
