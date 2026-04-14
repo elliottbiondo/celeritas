@@ -176,6 +176,10 @@ State collections need `resize(size)` operators for track slots.
 | `CELER_ENSURE` | Postconditions at function exit |
 | `CELER_VALIDATE` | User input validation (always active) |
 
+### Literal UDLs
+
+- In public headers, function/block-scope `using namespace celeritas::literals;` is allowed. Never introduce namespace-scope `using namespace` there.
+
 ### Type-Safe Indices & Collections
 
 | Type | Purpose |

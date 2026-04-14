@@ -2,23 +2,23 @@
 // Copyright Celeritas contributors: see top-level COPYRIGHT file for details
 // SPDX-License-Identifier: (Apache-2.0 OR MIT)
 //---------------------------------------------------------------------------//
-//! \file celeritas/field/RZMapField.hh
+//! \file accel/RZMapMagneticField.cc
 //---------------------------------------------------------------------------//
-#pragma once
+#include "RZMapMagneticField.hh"
 
-#include "corecel/Config.hh"
+#include "celeritas/field/RZMapField.hh"
 
-#if CELERITAS_USE_COVFIE || __DOXYGEN__
-#    include "RZMapField.covfie.hh"
-#else
-#    include "RZMapFieldData.hh"
-
-#    include "detail/NotImplementedField.hh"
 namespace celeritas
 {
 //---------------------------------------------------------------------------//
-//! Dummy class for R-Z map magnetic field when no backend is available.
-using RZMapField = detail::NotImplementedField<RZMapFieldParamsData>;
+// RZMAPMAGNETICFIELD IMPLEMENTATION
+//---------------------------------------------------------------------------//
+
+Real3 RZAdapterField::operator()(Real3 const& pos) const
+{
+    RZMapField calc_field{data};
+    return calc_field(pos);
+}
+
 //---------------------------------------------------------------------------//
 }  // namespace celeritas
-#endif  // CELERITAS_USE_COVFIE
