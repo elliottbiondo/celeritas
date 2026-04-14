@@ -287,7 +287,7 @@ inline CELER_FUNCTION T calc_dist_to_inside(BoundingBox<T> const& bbox,
             continue;
         }
 
-        real_type inv_dir = 1. / dir[ax];
+        T inv_dir = 1 / dir[ax];
 
         for (auto bound : range(Bound::size_))
         {
