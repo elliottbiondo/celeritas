@@ -131,25 +131,53 @@ BIHIntersectingVolFinder::operator()(BIHIntersectingVolFinder::Ray ray,
                                      real_type max_search_dist) const
     -> Intersection
 {
-    BIHNodeId previous_node;
-    BIHNodeId current_node{0};
+    // Stack of deferred nodes
+    BIHNodeId stack[17];  // max tree depth
+    int stack_ptr = 0;
 
     Intersection intersection{OnLocalSurface{}, max_search_dist};
 
-    do
+    BIHNodeId current_node{0};
+
+    while (current_node)
     {
         if (!view_.is_inner(current_node))
         {
             intersection = this->visit_leaf(
                 view_.leaf_node(current_node), ray, intersection, visit_vol);
+
+            // Pop or stop
+            current_node = stack_ptr > 0 ? stack[--stack_ptr] : BIHNodeId{};
+            continue;
         }
 
-        previous_node = exchange(
-            current_node,
-            this->next_node(
-                current_node, previous_node, ray, intersection.distance));
+        auto const& node = view_.inner_node(current_node);
+        auto const& l_edge = node.edges[BIHInnerNode::Side::left];
+        auto const& r_edge = node.edges[BIHInnerNode::Side::right];
 
-    } while (current_node);
+        bool hit_left
+            = this->visit_bbox(l_edge.bbox, ray, intersection.distance);
+        bool hit_right
+            = this->visit_bbox(r_edge.bbox, ray, intersection.distance);
+
+        if (hit_left && hit_right)
+        {
+            stack[stack_ptr++] = r_edge.child;
+            current_node = l_edge.child;
+        }
+        else if (hit_left)
+        {
+            current_node = l_edge.child;
+        }
+        else if (hit_right)
+        {
+            current_node = r_edge.child;
+        }
+        else
+        {
+            current_node = stack_ptr > 0 ? stack[--stack_ptr] : BIHNodeId{};
+        }
+    }
 
     return this->visit_inf_vols(intersection, visit_vol);
 }
